@@ -65,7 +65,6 @@ public class BorrowDAO {
 
     public void addBorrow(Borrow borrow) {
         String borrowQuery = "INSERT INTO Borrow (student_id, book_id, borrow_date, return_date) VALUES (?, ?, ?, ?)";
-
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement borrowStmt = connection.prepareStatement(borrowQuery);
              ) {
@@ -83,7 +82,6 @@ public class BorrowDAO {
 
     public void returnBook(int studentId, int bookId) {
         String query = "DELETE FROM Borrow WHERE student_id = ? AND book_id = ?";
-
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, studentId);

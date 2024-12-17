@@ -45,8 +45,8 @@ public class BorrowService {
         }
     }
     public String returnBook(int studentId, int bookId) {
-        borrowDAO.returnBook(studentId, bookId);
         bookDAO.updateBookAvailability(bookId, true);
+        borrowDAO.returnBook(studentId, bookId);
         return "Livre retourné avec succès!";
     }
 

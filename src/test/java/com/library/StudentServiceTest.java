@@ -23,8 +23,8 @@ class StudentServiceTest {
         studentService = new StudentService(studentDAO);
     }
 
-    @AfterAll
-    public static void tearDown() {
+    @AfterEach
+    public void tearDown() {
         System.out.println("Test teardown: Clearing database...");
         try (Connection connection = DbConnection.getConnection();
              Statement statement = connection.createStatement()) {
@@ -74,6 +74,6 @@ class StudentServiceTest {
         Student student2 = new Student(3, "Bob");
         studentService.addStudent(student1);
         studentService.addStudent(student2);
-        assertEquals(2, (long) studentDAO.getAllStudents().size());
+        assertEquals(2, (long) studentDAO.getAllStudents().stream().count());
     }
 }

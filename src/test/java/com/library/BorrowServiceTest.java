@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.sql.*;
 
 
-@TestMethodOrder(org.junit.jupiter.api.MethodOrderer.OrderAnnotation.class)
 class BorrowServiceTest {
     static BorrowService borrowService;
     static BookDAO bookDAO;
@@ -40,16 +39,16 @@ class BorrowServiceTest {
         studentservice=new StudentService(studentDAO);
         bookservice = new BookService(bookDAO);
 
-        bookDAO.add(new Book(1, "Java Programming", "John Doe", true));
-        bookDAO.add(new Book(2, "Advanced Java", "Jane Doe", true));
+        bookDAO.addWithId(new Book(1, "Java Programming", "John Doe", true));
+        bookDAO.addWithId(new Book(2, "Advanced Java", "Jane Doe", true));
 
-        studentDAO.addStudent(new Student(1, "Alice"));
-        studentDAO.addStudent(new Student(2, "Bob"));
+        studentDAO.addStudentWithId(new Student(1, "Alice"));
+        studentDAO.addStudentWithId(new Student(2, "Bob"));
 
     }
 
-    @AfterAll
-    public static void tearDown() {
+    @AfterEach
+    public void tearDown() {
         System.out.println("Test teardown: Clearing database...");
         try (Connection connection = DbConnection.getConnection();
              Statement statement = connection.createStatement()) {
@@ -71,7 +70,6 @@ class BorrowServiceTest {
     }
 
     @Test
-    @Order(1)
     void testBorrowBook() throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date borrowedDate = new Date();
@@ -91,15 +89,29 @@ class BorrowServiceTest {
     }
 
     @Test
-    @Order(2)
-    void testReturnBook() {
-        String result = borrowService.returnBook(1, 1);
-        assertEquals("Livre retourné avec succès!", result);
-        assertTrue(bookDAO.getBookById(1).isAvailable());
+    void testReturnBook() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date borrowedDate = new Date();
+        Date returnedDate = dateFormat.parse("20/12/2024");
+
+        Student student = studentservice.getStudentById(1);
+        Book book = bookservice.findBookById(1);
+
+        Borrow borrow = new Borrow(student,book,borrowedDate,returnedDate);
+        String result = borrowService.addBorrow(borrow);
+        Book updatedBook = bookservice.findBookById(1);
+        System.out.println(updatedBook);
+        assertFalse(updatedBook.isAvailable());
+
+        BorrowService borrowService2 = new BorrowService(borrowDAO, bookDAO, studentDAO);
+        String result2 = borrowService2.returnBook(1, 1);
+        Book updatedBook1 = bookservice.findBookById(1);
+        System.out.println("Freshly queried book availability: " + updatedBook1.isAvailable());
+
+        assertTrue(updatedBook1.isAvailable());
     }
 
     @Test
-    @Order(3)
     void testBorrowBookNotAvailable() throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date returnedDate = dateFormat.parse("20/12/2024");
@@ -110,13 +122,12 @@ class BorrowServiceTest {
         Borrow borrow = new Borrow(student,book,new Date(),returnedDate);
         String result = borrowService.addBorrow(borrow);
         Book updatedBook = bookDAO.getBookById(1);
-
+        System.out.println(updatedBook);
         //assertEquals("Le livre n'est pas disponible.", result);
       assertFalse(updatedBook.isAvailable());
     }
 
     @Test
-    @Order(4)
     void testBorrowBookStudentNotFound() throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date returnedDate = dateFormat.parse("20/12/2024");

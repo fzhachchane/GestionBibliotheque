@@ -90,6 +90,7 @@ public class BookDAO {
                 book.setAuthor(resultSet.getString("author"));
                 book.setIsbn(resultSet.getString("isbn"));
                 book.setYear(resultSet.getInt("year"));
+                book.setAvailable(resultSet.getBoolean("available"));
                 return book;
             }
         } catch (SQLException e) {
@@ -201,7 +202,12 @@ public class BookDAO {
              PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setBoolean(1, isAvailable);
             stmt.setInt(2, bookId);
-            stmt.executeUpdate();
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Book availability updated successfully for bookId: " + bookId);
+            } else {
+                System.out.println("No book found with id: " + bookId);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }

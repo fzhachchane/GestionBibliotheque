@@ -16,6 +16,7 @@ public class DbConnection {
             // Retourner la connexion avec les paramètres de connexion
             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
             // connection.setAutoCommit(false);
+            connection.setAutoCommit(true);
             return connection;
         } catch (ClassNotFoundException e) {
             // Si le driver est introuvable, cela lance une exception spécifique

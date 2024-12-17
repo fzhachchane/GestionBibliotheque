@@ -12,7 +12,6 @@ import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestMethodOrder(org.junit.jupiter.api.MethodOrderer.OrderAnnotation.class)
 class BookServiceTest {
     private BookService bookService;
     private BookDAO bookDAO;
