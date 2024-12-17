@@ -1,56 +1,120 @@
-package com.library.test;
+package com.library;
 
 import com.library.dao.BookDAO;
+import com.library.dao.BorrowDAO;
 import com.library.dao.StudentDAO;
 import com.library.model.Book;
+import com.library.model.Borrow;
 import com.library.model.Student;
+import com.library.service.BookService;
 import com.library.service.BorrowService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.library.service.StudentService;
+import com.library.util.DbConnection;
+import org.junit.jupiter.api.*;
+
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 import static org.junit.jupiter.api.Assertions.*;
+import java.sql.*;
 
+
+@TestMethodOrder(org.junit.jupiter.api.MethodOrderer.OrderAnnotation.class)
 class BorrowServiceTest {
-    private BorrowService borrowService;
-    private BookDAO bookDAO;
-    private StudentDAO studentDAO;
+    static BorrowService borrowService;
+    static BookDAO bookDAO;
+    static StudentDAO studentDAO;
+    static BorrowDAO borrowDAO;
+    static StudentService studentservice;
+    static BookService bookservice;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    static void setUp() {
         bookDAO = new BookDAO();
         studentDAO = new StudentDAO();
-        borrowService = new BorrowService(bookDAO, studentDAO);
+        borrowDAO = new BorrowDAO(studentDAO,bookDAO);
+        borrowService = new BorrowService(borrowDAO,bookDAO,studentDAO);
+        studentservice=new StudentService(studentDAO);
+        bookservice = new BookService(bookDAO);
 
-        // Ajouter un étudiant
-        studentDAO.addStudent(new Student(1, "Alice", "alice@example.com"));
-        studentDAO.addStudent(new Student(2, "Bob", "bob@example.com"));
+        bookDAO.add(new Book(1, "Java Programming", "John Doe", true));
+        bookDAO.add(new Book(2, "Advanced Java", "Jane Doe", true));
 
-        // Ajouter des livres
-        bookDAO.addBook(new Book(1, "Java Programming", "John Doe", true));
-        bookDAO.addBook(new Book(2, "Advanced Java", "Jane Doe", true));
+        studentDAO.addStudent(new Student(1, "Alice"));
+        studentDAO.addStudent(new Student(2, "Bob"));
+
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        System.out.println("Test teardown: Clearing database...");
+        try (Connection connection = DbConnection.getConnection();
+             Statement statement = connection.createStatement()) {
+            // Disable foreign key checks (if needed)
+            statement.execute("SET FOREIGN_KEY_CHECKS = 0");
+
+            // Truncate all tables
+            statement.execute("TRUNCATE TABLE Borrow");
+            statement.execute("TRUNCATE TABLE Book");
+            statement.execute("TRUNCATE TABLE Student");
+
+            // Re-enable foreign key checks
+            statement.execute("SET FOREIGN_KEY_CHECKS = 1");
+
+            System.out.println("Database cleared successfully!");
+        } catch (SQLException e) {
+            System.err.println("Error clearing database: " + e.getMessage());
+        }
     }
 
     @Test
-    void testBorrowBook() {
-        assertEquals("Livre emprunté avec succès!", borrowService.borrowBook(1, 1));
-        assertFalse(bookDAO.getBookById(1).get().isAvailable());
+    @Order(1)
+    void testBorrowBook() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date borrowedDate = new Date();
+        Date returnedDate = dateFormat.parse("20/12/2024");
+        Student student = studentservice.getStudentById(1);
+        Book book = bookservice.findBookById(1);
+
+        Borrow borrow = new Borrow(student,book,borrowedDate,returnedDate);
+        String result = borrowService.addBorrow(borrow);
+        assertEquals("Livre emprunté avec succès!", result);
+
+        assertFalse(bookDAO.getBookById(1).isAvailable());
     }
 
     @Test
+    @Order(2)
     void testReturnBook() {
-        borrowService.borrowBook(1, 1);
-        assertEquals("Livre retourné avec succès!", borrowService.returnBook(1, 1));
-        assertTrue(bookDAO.getBookById(1).get().isAvailable());
+        String result = borrowService.returnBook(1, 1);
+        assertEquals("Livre retourné avec succès!", result);
+        assertTrue(bookDAO.getBookById(1).isAvailable());
     }
 
     @Test
-    void testBorrowBookNotAvailable() {
-        borrowService.borrowBook(1, 1);
-        assertEquals("Le livre n'est pas disponible.", borrowService.borrowBook(2, 1));
+    @Order(3)
+    void testBorrowBookNotAvailable() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date returnedDate = dateFormat.parse("20/12/2024");
+        Student student = studentservice.getStudentById(1);
+        Book book = bookservice.findBookById(1);
+        Borrow borrow = new Borrow(student,book,new Date(),returnedDate);
+        borrowService.addBorrow(borrow);
+        String result = borrowService.addBorrow(borrow);
+        assertEquals("Le livre n'est pas disponible.", result);
+        assertFalse(bookDAO.getBookById(1).isAvailable());
     }
 
     @Test
-    void testBorrowBookStudentNotFound() {
-        assertEquals("Étudiant ou livre non trouvé.", borrowService.borrowBook(3, 1));
+    @Order(4)
+    void testBorrowBookStudentNotFound() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date returnedDate = dateFormat.parse("20/12/2024");
+        Borrow borrow = new Borrow(studentservice.getStudentById(5),bookservice.findBookById(1),new Date(),returnedDate);
+        String result = borrowService.addBorrow(borrow);
+        assertEquals("Étudiant ou livre non trouvé.", result);
     }
 }

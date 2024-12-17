@@ -1,13 +1,18 @@
-package com.library.test;
+package com.library;
 
 import com.library.dao.BookDAO;
 import com.library.model.Book;
 import com.library.service.BookService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.library.util.DbConnection;
+import org.junit.jupiter.api.*;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(org.junit.jupiter.api.MethodOrderer.OrderAnnotation.class)
 class BookServiceTest {
     private BookService bookService;
     private BookDAO bookDAO;
@@ -18,28 +23,49 @@ class BookServiceTest {
         bookService = new BookService(bookDAO);
     }
 
+    @AfterAll
+    public static void tearDown() {
+        System.out.println("Test teardown: Clearing database...");
+        try (Connection connection = DbConnection.getConnection();
+             Statement statement = connection.createStatement()) {
+
+            // Disable foreign key checks (if needed)
+            statement.execute("SET FOREIGN_KEY_CHECKS = 0");
+
+            // Truncate all tables
+            statement.execute("TRUNCATE TABLE Borrow");
+            statement.execute("TRUNCATE TABLE Book");
+            statement.execute("TRUNCATE TABLE Student");
+
+            // Re-enable foreign key checks
+            statement.execute("SET FOREIGN_KEY_CHECKS = 1");
+
+            System.out.println("Database cleared successfully!");
+        } catch ( SQLException e) {
+            System.err.println("Error clearing database: " + e.getMessage());
+        }
+    }
+
+
     @Test
+    @Order(1)
     void testAddBook() {
         Book book = new Book(1, "Java Programming", "John Doe", true);
         bookService.addBook(book);
         assertEquals(1, bookDAO.getAllBooks().size());
-        assertEquals("Java Programming", bookDAO.getBookById(1).get().getTitle());
+        assertEquals("Java Programming", bookDAO.getBookById(1).getTitle());
     }
-
     @Test
+    @Order(2)
     void testUpdateBook() {
-        Book book = new Book(1, "Java Programming", "John Doe", true);
-        bookService.addBook(book);
-        bookService.updateBook(1, "Advanced Java", "Jane Doe", false);
-        assertEquals("Advanced Java", bookDAO.getBookById(1).get().getTitle());
-        assertFalse(bookDAO.getBookById(1).get().isAvailable());
+        Book book = new Book(1, "Advanced Java", "John Doe", true);
+        bookService.updateBook(book);
+        assertEquals("Advanced Java", bookDAO.getBookById(1).getTitle());
     }
-
     @Test
+    @Order(3)
     void testDeleteBook() {
-        Book book = new Book(1, "Java Programming", "John Doe", true);
-        bookService.addBook(book);
-        bookService.deleteBook(1);
-        assertTrue(bookDAO.getBookById(1).isEmpty());
+        bookService.deleteBook("1");
+        assertNull(bookDAO.getBookById(1));
     }
 }

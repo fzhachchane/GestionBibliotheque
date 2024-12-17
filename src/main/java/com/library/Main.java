@@ -1,5 +1,6 @@
 package com.library;
 
+import com.library.dao.BookDAO;
 import com.library.dao.StudentDAO;
 import com.library.service.BorrowService;
 import com.library.service.BookService;
@@ -12,16 +13,14 @@ import com.library.dao.BorrowDAO;  // Importer BorrowDAO
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
         Scanner scanner = new Scanner(System.in);
-
-        Student student = new Student(1, "John Doe");
-        Book book = new Book("Effective Java", "Joshua Bloch", "123456", 2017);
-        Borrow borrow = new Borrow(1, student, book, new Date(), new Date());
 
         // Connexion à la base de données
         Connection connection = null;
@@ -32,12 +31,13 @@ public class Main {
             System.exit(1);
         }
 
-        // Création des services
-        BookService bookService = new BookService();
-        StudentDAO studentDAO = new StudentDAO(connection);
+        BookDAO bookDAO = new BookDAO();
+        StudentDAO studentDAO = new StudentDAO();
+        BookService bookService = new BookService(bookDAO);
         StudentService studentService = new StudentService(studentDAO);
-        BorrowDAO borrowDAO = new BorrowDAO();  // Création de BorrowDAO
-        BorrowService borrowService = new BorrowService(borrowDAO);  // Passer BorrowDAO au constructeur de BorrowService
+        BorrowDAO borrowDAO = new BorrowDAO(studentDAO,bookDAO);
+        BorrowService borrowService = new BorrowService(borrowDAO,bookDAO,studentDAO);
+
 
         boolean running = true;
 
@@ -61,46 +61,51 @@ public class Main {
                     String title = scanner.nextLine();
                     System.out.print("Entrez l'auteur du livre: ");
                     String author = scanner.nextLine();
-                    Book book1 = new Book(title, author);
-                    bookService.addBook(book1);
+                    System.out.print("Entrez l'année de publication: ");
+                    int year = scanner.nextInt();
+                    scanner.nextLine();
+                    Book newBook = new Book(title, author, year);
+                    bookService.addBook(newBook);
                     break;
 
                 case 2:
-                    bookService.displayBooks();
+                    bookService.getAllBooks();
                     break;
 
                 case 3:
-                    System.out.print("Entrez l'ID de l'étudiant: ");
-                    int studentId = scanner.nextInt();
-                    scanner.nextLine();
                     System.out.print("Entrez le nom de l'étudiant: ");
                     String studentName = scanner.nextLine();
-                    Student student1 = new Student(studentId, studentName);
-                    studentService.addStudent(student1);
+                    Student newStudent = new Student(studentName);
+                    studentService.addStudent(newStudent);
                     break;
 
                 case 4:
                     System.out.println("Liste des étudiants:");
-                    studentService.displayStudents();
+                    studentService.getAllStudents();
                     break;
 
                 case 5:
-                    System.out.print("Entrez l'ID de l'étudiant: ");
-                    int borrowStudentId = scanner.nextInt();
-                    System.out.print("Entrez l'ID du livre: ");
-                    int borrowBookId = scanner.nextInt();
-                    Student studentForBorrow = studentService.findStudentById(borrowStudentId);
-                    Book bookForBorrow = bookService.findBookById(borrowBookId);
+                    System.out.print("Entrez le nom de l'étudiant: ");
+                    String studentNameForBorrow = scanner.nextLine();
+                    System.out.print("Entrez le titre du livre: ");
+                    String bookTitleForBorrow = scanner.nextLine();
+
+                    System.out.print("Entrez la date de retour (jj/mm/aaaa): ");
+                    String returnDateStr = scanner.nextLine();
+                    scanner.nextLine();
+
+                    Student studentForBorrow = studentService.findStudentByName(studentNameForBorrow);
+                    Book bookForBorrow = bookService.findBookByTitle(bookTitleForBorrow);
+
+                    Date returnDate = null;
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                    returnDate = sdf.parse(returnDateStr);
+
                     if (studentForBorrow != null && bookForBorrow != null) {
-                        // Créer un objet Borrow avec les informations nécessaires
-                        Borrow borrow1 = new Borrow(
-                                0,
-                                studentForBorrow,
-                                bookForBorrow,
-                                new Date(),  // Date d'emprunt actuelle
-                                null         // Date de retour pas encore définie
-                        );
-                        borrowService.borrowBook(borrow1);  // Appel de la méthode avec l'objet Borrow
+                        Borrow borrow1 = new Borrow(studentForBorrow, bookForBorrow, new Date(), returnDate);
+                        borrowService.addBorrow(borrow1);
+
                     } else {
                         System.out.println("Étudiant ou livre introuvable.");
                     }

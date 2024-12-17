@@ -13,6 +13,10 @@ public class Student {
         this.id = id;
         this.name = name;
     }
+    public Student(String name) {
+        this.id = 0;
+        this.name = name;
+    }
 
     // Getters et Setters
     public int getId() {
@@ -29,5 +33,13 @@ public class Student {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

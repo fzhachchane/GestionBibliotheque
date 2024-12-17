@@ -5,29 +5,38 @@ public class Book {
     private String title;
     private String author;
     private String publisher;
-    private int publishedYear;
+    private int year;
     private String isbn;
+    private boolean available = true;
 
     // Constructeur par défaut
     public Book() {
     }
 
-    // Constructeur complet
-    public Book(String title, String author, String publisher, int year) {
+    public Book(int id, String title, String author, String publisher, int year, String isbn, boolean available) {
+        this.id = id;
         this.title = title;
         this.author = author;
         this.publisher = publisher;
-        this.publishedYear = year;
+        this.year = year;
+        this.isbn = isbn;
+        this.available = available;
     }
 
-    // Constructeur complet 2
-    public Book(String title, String author, String publisher, int year, String isbn) {
+    // Constructeur 2
+    public Book(String title, String author,int year) {
+        this.id = 0;
         this.title = title;
         this.author = author;
-        this.publisher = publisher;
-        this.publishedYear = year;
-        this.isbn = isbn;
+        this.year = year;
     }
+    public Book(int id,String title, String author,boolean available) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.available= available;
+    }
+
 
     // Constructeur additionnel si nécessaire
     public Book(String title, String author) {
@@ -68,12 +77,20 @@ public class Book {
         this.publisher = publisher;
     }
 
-    public int getPublishedYear() {
-        return publishedYear;
+    public int getYear() {
+        return year;
     }
 
-    public void setPublishedYear(int publishedYear) {
-        this.publishedYear = publishedYear;
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 
     public String getIsbn() {
@@ -82,5 +99,18 @@ public class Book {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", publisher='" + publisher + '\'' +
+                ", year=" + year +
+                ", isbn='" + isbn + '\'' +
+                ", available=" + available +
+                '}';
     }
 }

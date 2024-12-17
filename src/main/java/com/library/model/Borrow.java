@@ -18,6 +18,21 @@ public class Borrow {
         this.returnDate = returnDate;
     }
 
+    // Constructeur autre
+    public Borrow(Student student, Book book, Date borrowDate) {
+        this.id = 0;
+        this.student = student;
+        this.book = book;
+        this.borrowDate = borrowDate;
+    }
+    public Borrow(Student student, Book book, Date borrowDate, Date returnDate) {
+        this.id = 0;
+        this.student = student;
+        this.book = book;
+        this.borrowDate = borrowDate;
+        this.returnDate = returnDate;
+    }
+
     // Getters et Setters
     public int getId() {
         return id;
@@ -57,5 +72,16 @@ public class Borrow {
 
     public void setReturnDate(Date returnDate) {
         this.returnDate = returnDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Borrow{" +
+                "id=" + id +
+                ", student=" + student +
+                ", book=" + book +
+                ", borrowDate=" + borrowDate +
+                ", returnDate=" + returnDate +
+                '}';
     }
 }

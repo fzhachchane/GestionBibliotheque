@@ -11,21 +11,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BorrowDAO {
+    private final StudentDAO studentDAO;
+    private final BookDAO bookDAO;
+
+    public BorrowDAO(StudentDAO studentDAO, BookDAO bookDAO) {
+        this.studentDAO = studentDAO;
+        this.bookDAO = bookDAO;
+    }
+
     public List<Borrow> getAllBorrows() {
         List<Borrow> borrows = new ArrayList<>();
-        String query = "SELECT * FROM borrows";
+        String query = "SELECT * FROM Borrow";
         try (Connection connection = DbConnection.getConnection();
              Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                Student student = new Student(
-                        rs.getInt("member_id"),
-                        rs.getString("member_name")
-                );
-                Book book = new Book(
-                        rs.getString("book_id"),
-                        rs.getString("book_title")
-                );
+                int studentId = rs.getInt("student_id");
+                int bookId = rs.getInt("book_id");
+
+                Student student = studentDAO.getStudentById(studentId);
+                Book book = bookDAO.getBookById(bookId);
+
                 Borrow borrow = new Borrow(
                         rs.getInt("id"),
                         student,
@@ -51,22 +57,47 @@ public class BorrowDAO {
             stmt.setDate(3, new java.sql.Date(borrow.getBorrowDate().getTime()));
             stmt.setDate(4, new java.sql.Date(borrow.getReturnDate().getTime()));
             stmt.executeUpdate();
+            System.out.println("Livre emprunté avec succès!");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    //public void addBorrow(Borrow borrow) {
-    //    String query = "INSERT INTO borrows (member, book, borrow_date, return_date) VALUES (?, ?, ?, ?)";
-    //    try (Connection connection = DbConnection.getConnection();
-    //         PreparedStatement stmt = connection.prepareStatement(query)) {
-    //        stmt.setString(1, borrow.getStudent());
-    //        stmt.setString(2, borrow.getBook());
-    //        stmt.setDate(3, new java.sql.Date(borrow.getBorrowDate().getTime()));
-    //        stmt.setDate(4, new java.sql.Date(borrow.getReturnDate().getTime()));
-    //        stmt.executeUpdate();
-    //    } catch (SQLException e) {
-    //        e.printStackTrace();
-    //    }
-    //}
+    public void addBorrow(Borrow borrow) {
+        String borrowQuery = "INSERT INTO Borrow (student_id, book_id, borrow_date, return_date) VALUES (?, ?, ?, ?)";
+        String updateBookQuery = "UPDATE Book SET available = ? WHERE id = ?";
+
+        try (Connection connection = DbConnection.getConnection();
+             PreparedStatement borrowStmt = connection.prepareStatement(borrowQuery);
+             PreparedStatement updateBookStmt = connection.prepareStatement(updateBookQuery)) {
+
+            // Insert into Borrow table
+            borrowStmt.setInt(1, borrow.getStudent().getId());
+            borrowStmt.setInt(2, borrow.getBook().getId());
+            borrowStmt.setDate(3, new java.sql.Date(borrow.getBorrowDate().getTime()));
+            borrowStmt.setDate(4, new java.sql.Date(borrow.getReturnDate().getTime()));
+            borrowStmt.executeUpdate();
+
+            // Update Book availability to false
+            updateBookStmt.setBoolean(1, false);
+            updateBookStmt.setInt(2, borrow.getBook().getId());
+            updateBookStmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void returnBook(int studentId, int bookId) {
+        String query = "DELETE FROM Borrow WHERE student_id = ? AND book_id = ?";
+
+        try (Connection connection = DbConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, studentId);
+            stmt.setInt(2, bookId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
