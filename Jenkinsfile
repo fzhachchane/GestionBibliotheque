@@ -21,12 +21,8 @@ pipeline {
         }
         stage('Quality Analysis') {
             steps {
-                try {
-                    withSonarQubeEnv('SonarQube') {
-                        sh '${MAVEN_HOME}/bin/mvn sonar:sonar'
-                    }
-                } catch (Exception e) {
-                    echo "SonarQube analysis failed: ${e.getMessage()}"
+                withSonarQubeEnv('SonarQube') {
+                    sh '${MAVEN_HOME}/bin/mvn sonar:sonar'
                 }
             }
         }
