@@ -14,12 +14,12 @@ public class BookDAO {
         String sql = "INSERT INTO books (title, author, isbn, published_year) VALUES (?, ?, ?, ?)";
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-             
+
             statement.setString(1, book.getTitle());
             statement.setString(2, book.getAuthor());
             statement.setString(3, book.getIsbn());
-            statement.setInt(4, book.getPublishedYear());
-            
+            statement.setInt(4, book.getYear());
+
             int rowsInserted = statement.executeUpdate();
             if (rowsInserted > 0) {
                 System.out.println("Livre inséré avec succès !");
@@ -33,20 +33,20 @@ public class BookDAO {
     public Book getBookByIsbn(String isbn) {
         String sql = "SELECT * FROM books WHERE isbn = ?";
         Book book = null;
-        
+
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-             
+
             statement.setString(1, isbn);
             ResultSet resultSet = statement.executeQuery();
-            
+
             if (resultSet.next()) {
                 book = new Book();
                 book.setId(resultSet.getInt("id"));
                 book.setTitle(resultSet.getString("title"));
                 book.setAuthor(resultSet.getString("author"));
                 book.setIsbn(resultSet.getString("isbn"));
-                book.setPublishedYear(resultSet.getInt("published_year"));
+                book.setYear(resultSet.getInt("published_year"));
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération du livre : " + e.getMessage());
@@ -70,7 +70,7 @@ public class BookDAO {
                 book.setTitle(resultSet.getString("title"));
                 book.setAuthor(resultSet.getString("author"));
                 book.setIsbn(resultSet.getString("isbn"));
-                book.setPublishedYear(resultSet.getInt("published_year"));
+                book.setYear(resultSet.getInt("published_year"));
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération du livre : " + e.getMessage());
@@ -78,23 +78,49 @@ public class BookDAO {
 
         return book;
     }
-    
+
+    // recuperer livre par titre
+    public Book getBookByTitle(String title) {
+        Book book = null;
+        String query = "SELECT * FROM Book WHERE title = ?";
+
+        try (Connection connection = DbConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, title);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String bookTitle = resultSet.getString("title");
+                String author = resultSet.getString("author");
+                String publisher = resultSet.getString("publisher");
+                int year = resultSet.getInt("year");
+                String isbn = resultSet.getString("isbn");
+                Boolean available = resultSet.getBoolean("available");
+                book = new Book(id, bookTitle, author,publisher, year,isbn,available);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return book;
+    }
+
     // Récupérer tous les livres
     public List<Book> getAllBooks() {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM books";
-        
+
         try (Connection connection = DbConnection.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
-             
+
             while (resultSet.next()) {
                 Book book = new Book();
                 book.setId(resultSet.getInt("id"));
                 book.setTitle(resultSet.getString("title"));
                 book.setAuthor(resultSet.getString("author"));
                 book.setIsbn(resultSet.getString("isbn"));
-                book.setPublishedYear(resultSet.getInt("published_year"));
+                book.setYear(resultSet.getInt("published_year"));
                 books.add(book);
             }
         } catch (SQLException e) {
@@ -104,11 +130,11 @@ public class BookDAO {
     }
 
     // supprimer un livre en utilisant son ID
-    public boolean delete(int id) {
-        String query = "DELETE FROM books WHERE id = ?";
+    public boolean delete(String isbn) {
+        String query = "DELETE FROM books WHERE isbn = ?";
         try (Connection conn = DbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, id);
+            stmt.setString(1, isbn);
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -120,13 +146,13 @@ public class BookDAO {
 
     // mettre a jour les informations d'un livre
     public boolean update(Book book) {
-        String query = "UPDATE books SET title = ?, author = ?, published_year = ? WHERE id = ?";
+        String query = "UPDATE books SET title = ?, author = ?, published_year = ? WHERE isbn = ?";
         try (Connection conn = DbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, book.getTitle());
             stmt.setString(2, book.getAuthor());
-            stmt.setInt(3, book.getPublishedYear());
-            stmt.setInt(4, book.getId());
+            stmt.setInt(3, book.getYear());
+            stmt.setString(4, book.getIsbn());
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -134,5 +160,31 @@ public class BookDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean isBookExists(int bookId) {
+        String query = "SELECT COUNT(*) FROM Book WHERE id = ?";
+        try (Connection connection = DbConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, bookId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void updateBookAvailability(int bookId, boolean isAvailable) {
+        String query = "UPDATE Book SET available = ? WHERE id = ?";
+
+        try (Connection connection = DbConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setBoolean(1, isAvailable);
+            stmt.setInt(2, bookId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,13 +1,18 @@
-package com.library.test;
+package com.library;
 
 import com.library.dao.StudentDAO;
 import com.library.model.Student;
 import com.library.service.StudentService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.library.util.DbConnection;
+import org.junit.jupiter.api.*;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(org.junit.jupiter.api.MethodOrderer.OrderAnnotation.class)
 class StudentServiceTest {
     private StudentService studentService;
     private StudentDAO studentDAO;
@@ -18,31 +23,57 @@ class StudentServiceTest {
         studentService = new StudentService(studentDAO);
     }
 
+    @AfterAll
+    public static void tearDown() {
+        System.out.println("Test teardown: Clearing database...");
+        try (Connection connection = DbConnection.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.execute("SET FOREIGN_KEY_CHECKS = 0");
+            statement.execute("TRUNCATE TABLE Borrow");
+            statement.execute("TRUNCATE TABLE Book");
+            statement.execute("TRUNCATE TABLE Student");
+            statement.execute("SET FOREIGN_KEY_CHECKS = 1");
+            System.out.println("Database cleared successfully!");
+        } catch (SQLException e) {
+            System.err.println("Error clearing database: " + e.getMessage());
+        }
+    }
+
     @Test
+    @Order(1)
     void testAddStudent() {
-        studentService.addStudent(1, "Alice", "alice@example.com");
+        Student student = new Student(3, "new name");
+        studentService.addStudent(student);
         assertEquals(1, studentDAO.getAllStudents().size());
-        assertEquals("Alice", studentDAO.getStudentById(1).get().getName());
+        assertEquals("new name", studentDAO.getStudentById(3).getName());
     }
 
     @Test
+    @Order(2)
     void testUpdateStudent() {
-        studentService.addStudent(1, "Alice", "alice@example.com");
-        studentService.updateStudent(1, "Alice Smith", "alice.smith@example.com");
-        assertEquals("Alice Smith", studentDAO.getStudentById(1).get().getName());
+        Student student = new Student(3, "new name");
+        Student studentupdated = new Student(3, "new name updated");
+        studentService.addStudent(student);
+        studentService.updateStudent(studentupdated);
+        assertEquals("new name updated", studentDAO.getStudentById(3).getName());
     }
 
     @Test
+    @Order(3)
     void testDeleteStudent() {
-        studentService.addStudent(1, "Alice", "alice@example.com");
-        studentService.deleteStudent(1);
-        assertTrue(studentDAO.getStudentById(1).isEmpty());
+        Student student = new Student(3, "new name");
+        studentService.addStudent(student);
+        studentService.deleteStudent(3);
+        assertNull(studentDAO.getStudentById(3));
     }
 
     @Test
+    @Order(4)
     void testGetAllStudents() {
-        studentService.addStudent(1, "Alice", "alice@example.com");
-        studentService.addStudent(2, "Bob", "bob@example.com");
+        Student student1 = new Student(2, "Alice");
+        Student student2 = new Student(3, "Bob");
+        studentService.addStudent(student1);
+        studentService.addStudent(student2);
         assertEquals(2, studentDAO.getAllStudents().size());
     }
 }
