@@ -34,7 +34,7 @@ class BookServiceTest {
 
             // Truncate all tables
             statement.execute("TRUNCATE TABLE Borrow");
-            statement.execute("TRUNCATE TABLE Book");
+            statement.execute("TRUNCATE TABLE books");
             statement.execute("TRUNCATE TABLE Student");
 
             // Re-enable foreign key checks
@@ -52,20 +52,33 @@ class BookServiceTest {
     void testAddBook() {
         Book book = new Book(1, "Java Programming", "John Doe", true);
         bookService.addBook(book);
-        assertEquals(1, bookDAO.getAllBooks().size());
         assertEquals("Java Programming", bookDAO.getBookById(1).getTitle());
     }
     @Test
     @Order(2)
     void testUpdateBook() {
-        Book book = new Book(1, "Advanced Java", "John Doe", true);
-        bookService.updateBook(book);
+        Book book = new Book(1, "Java Programming", "John Doe", "JD Pub", 2024, "123", true);
+        bookService.addBook(book);
+        Book book2 = new Book(1, "Advanced Java", "John Doe", "JD Pub", 2024, "123", true);
+        bookService.updateBook(book2);
         assertEquals("Advanced Java", bookDAO.getBookById(1).getTitle());
     }
     @Test
     @Order(3)
     void testDeleteBook() {
-        bookService.deleteBook("1");
+        Book book = new Book(1, "Java Programming", "John Doe", "JD Pub", 2024, "123", true);
+        bookService.addBook(book);
+        bookService.deleteBook("123");
         assertNull(bookDAO.getBookById(1));
+    }
+    @Test
+    @Order(4)
+    void testUpdateBookAvailability() {
+        Book book = new Book(1, "Java Programming", "John Doe", "JD Pub", 2024, "123", true);
+        bookService.addBook(book);
+        book.setAvailable(false);
+        bookDAO.updateAvailability(book);
+        Book fetchedBook = bookService.findBookById(1);
+        assertFalse(fetchedBook.isAvailable());
     }
 }

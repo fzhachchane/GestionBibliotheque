@@ -9,9 +9,9 @@ import com.library.model.Book;
 import com.library.model.Student;
 import com.library.model.Borrow;
 import com.library.dao.BorrowDAO;  // Importer BorrowDAO
+import com.library.util.DbConnection;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,17 +19,11 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, SQLException {
         Scanner scanner = new Scanner(System.in);
 
         // Connexion à la base de données
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/library_db", "root", "password");
-        } catch (SQLException e) {
-            System.err.println("Erreur lors de la connexion à la base de données : " + e.getMessage());
-            System.exit(1);
-        }
+        Connection connection = DbConnection.getConnection();
 
         BookDAO bookDAO = new BookDAO();
         StudentDAO studentDAO = new StudentDAO();

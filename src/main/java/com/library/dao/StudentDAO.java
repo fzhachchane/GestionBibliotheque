@@ -4,8 +4,6 @@ import com.library.model.Student;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import com.library.util.DbConnection;
 
 public class StudentDAO {
@@ -20,6 +18,20 @@ public class StudentDAO {
             System.err.println("Erreur dans l'ajout de student: " + e.getMessage());
         }
     }
+
+    public void addStudentWithId(Student student) {
+        String sql = "INSERT INTO Student (id, name) VALUES (?,?)";
+        try (Connection connection = DbConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(2, student.getName());
+            statement.setInt(1, student.getId());
+            statement.executeUpdate();
+            System.out.println("Student ajouté avec succes!");
+        } catch (SQLException e) {
+            System.err.println("Erreur dans l'ajout de student: " + e.getMessage());
+        }
+    }
+
     public Student getStudentById(int id) {
         String sql = "SELECT * FROM Student WHERE id = ?";
         Student student = null;

@@ -22,16 +22,22 @@ public class BorrowService {
 
     // Méthode pour emprunter un livre
     public String addBorrow(Borrow borrow) {
-        Book book = bookDAO.getBookById(borrow.getBook().getId());
         if (borrow.getStudent() == null || borrow.getBook() == null) {
             return "Étudiant ou livre non trouvé.";
         }
+
+        Book book = bookDAO.getBookById(borrow.getBook().getId());
+        if (book == null) {
+            return "Livre introuvable.";
+        }
+
         try {
             if (!book.isAvailable()) {
                 return "Le livre n'est pas disponible.";
             }
             // Ajout de l'emprunt
             borrowDAO.addBorrow(borrow);
+            bookDAO.updateBookAvailability(book.getId(), false);
             return "Livre emprunté avec succès!";
         } catch (Exception e) {
             e.printStackTrace();

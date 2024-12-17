@@ -30,7 +30,7 @@ class StudentServiceTest {
              Statement statement = connection.createStatement()) {
             statement.execute("SET FOREIGN_KEY_CHECKS = 0");
             statement.execute("TRUNCATE TABLE Borrow");
-            statement.execute("TRUNCATE TABLE Book");
+            statement.execute("TRUNCATE TABLE books");
             statement.execute("TRUNCATE TABLE Student");
             statement.execute("SET FOREIGN_KEY_CHECKS = 1");
             System.out.println("Database cleared successfully!");
@@ -43,7 +43,7 @@ class StudentServiceTest {
     @Order(1)
     void testAddStudent() {
         Student student = new Student(3, "new name");
-        studentService.addStudent(student);
+        studentService.addStudentWithId(student);
         assertEquals(1, studentDAO.getAllStudents().size());
         assertEquals("new name", studentDAO.getStudentById(3).getName());
     }
@@ -74,6 +74,6 @@ class StudentServiceTest {
         Student student2 = new Student(3, "Bob");
         studentService.addStudent(student1);
         studentService.addStudent(student2);
-        assertEquals(2, studentDAO.getAllStudents().size());
+        assertEquals(2, (long) studentDAO.getAllStudents().size());
     }
 }
