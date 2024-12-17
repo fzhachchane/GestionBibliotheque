@@ -53,7 +53,7 @@ class StudentServiceTest {
     void testUpdateStudent() {
         Student student = new Student(3, "new name");
         Student studentupdated = new Student(3, "new name updated");
-        studentService.addStudent(student);
+        studentService.addStudentWithId(student);
         studentService.updateStudent(studentupdated);
         assertEquals("new name updated", studentDAO.getStudentById(3).getName());
     }
@@ -62,7 +62,7 @@ class StudentServiceTest {
     @Order(3)
     void testDeleteStudent() {
         Student student = new Student(3, "new name");
-        studentService.addStudent(student);
+        studentService.addStudentWithId(student);
         studentService.deleteStudent(3);
         assertNull(studentDAO.getStudentById(3));
     }
@@ -72,8 +72,8 @@ class StudentServiceTest {
     void testGetAllStudents() {
         Student student1 = new Student(2, "Alice");
         Student student2 = new Student(3, "Bob");
-        studentService.addStudent(student1);
-        studentService.addStudent(student2);
+        studentService.addStudentWithId(student1);
+        studentService.addStudentWithId(student2);
         assertEquals(2, (long) studentDAO.getAllStudents().stream().count());
     }
 }
