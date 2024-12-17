@@ -23,8 +23,8 @@ class BookServiceTest {
         bookService = new BookService(bookDAO);
     }
 
-    @AfterAll
-    public static void tearDown() {
+    @AfterEach
+    public void tearDown() {
         System.out.println("Test teardown: Clearing database...");
         try (Connection connection = DbConnection.getConnection();
              Statement statement = connection.createStatement()) {
@@ -48,14 +48,13 @@ class BookServiceTest {
 
 
     @Test
-    @Order(1)
     void testAddBook() {
         Book book = new Book(1, "Java Programming", "John Doe", true);
         bookService.addBook(book);
         assertEquals("Java Programming", bookDAO.getBookById(1).getTitle());
     }
     @Test
-    @Order(2)
+
     void testUpdateBook() {
         Book book = new Book(1, "Java Programming", "John Doe", "JD Pub", 2024, "123", true);
         bookService.addBook(book);
@@ -64,7 +63,6 @@ class BookServiceTest {
         assertEquals("Advanced Java", bookDAO.getBookById(1).getTitle());
     }
     @Test
-    @Order(3)
     void testDeleteBook() {
         Book book = new Book(1, "Java Programming", "John Doe", "JD Pub", 2024, "123", true);
         bookService.addBook(book);
@@ -72,7 +70,6 @@ class BookServiceTest {
         assertNull(bookDAO.getBookById(1));
     }
     @Test
-    @Order(4)
     void testUpdateBookAvailability() {
         Book book = new Book(1, "Java Programming", "John Doe", "JD Pub", 2024, "123", true);
         bookService.addBook(book);
