@@ -16,7 +16,7 @@ public class BookService {
 
     // Ajouter un livre
     public void addBook(Book book) {
-        bookDAO.add(book);
+        bookDAO.addWithId(book);
     }
 
     // Afficher tous les livres

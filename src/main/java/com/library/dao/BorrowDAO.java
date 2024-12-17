@@ -49,7 +49,7 @@ public class BorrowDAO {
 
     public void save(Borrow borrow) {
         String query =
-                "INSERT INTO borrows (member_id, book_id, borrow_date, return_date) VALUES (?, ?, ?, ?)";
+                "INSERT INTO Borrow (student_id, book_id, borrow_date, return_date) VALUES (?, ?, ?, ?)";
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, borrow.getStudent().getId());
@@ -65,23 +65,16 @@ public class BorrowDAO {
 
     public void addBorrow(Borrow borrow) {
         String borrowQuery = "INSERT INTO Borrow (student_id, book_id, borrow_date, return_date) VALUES (?, ?, ?, ?)";
-        String updateBookQuery = "UPDATE Book SET available = ? WHERE id = ?";
 
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement borrowStmt = connection.prepareStatement(borrowQuery);
-             PreparedStatement updateBookStmt = connection.prepareStatement(updateBookQuery)) {
-
+             ) {
             // Insert into Borrow table
             borrowStmt.setInt(1, borrow.getStudent().getId());
             borrowStmt.setInt(2, borrow.getBook().getId());
             borrowStmt.setDate(3, new java.sql.Date(borrow.getBorrowDate().getTime()));
             borrowStmt.setDate(4, new java.sql.Date(borrow.getReturnDate().getTime()));
             borrowStmt.executeUpdate();
-
-            // Update Book availability to false
-            updateBookStmt.setBoolean(1, false);
-            updateBookStmt.setInt(2, borrow.getBook().getId());
-            updateBookStmt.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();

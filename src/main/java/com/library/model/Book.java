@@ -7,7 +7,7 @@ public class Book {
     private String publisher;
     private int year;
     private String isbn;
-    private boolean available = true;
+    private boolean available;
 
     // Constructeur par défaut
     public Book() {
@@ -29,6 +29,7 @@ public class Book {
         this.title = title;
         this.author = author;
         this.year = year;
+        this.available = true;
     }
     public Book(int id,String title, String author,boolean available) {
         this.id = id;

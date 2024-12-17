@@ -6,6 +6,7 @@ com/library/service/StudentService.class
 com/library/Main.class
 com/library/dao/StudentDAO.class
 com/library/service/BookService.class
+com/library/TestAivenConnection.class
 com/library/dao/BorrowDAO.class
 com/library/model/Book.class
 com/library/model/Borrow.class

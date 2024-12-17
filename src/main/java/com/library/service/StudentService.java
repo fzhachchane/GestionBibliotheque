@@ -15,6 +15,10 @@ public class StudentService {
     public void addStudent(Student student) {
         studentDAO.addStudent(student);
     }
+    public void addStudentWithId(Student student) {
+        studentDAO.addStudentWithId(student);
+    }
+
     public Student getStudentById(int id) {
         return studentDAO.getStudentById(id);
     }
