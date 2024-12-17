@@ -83,9 +83,8 @@ class BorrowServiceTest {
 
         BookService bookservice2 = new BookService(bookDAO);
         Book updatedBook = bookservice2.findBookById(1);
-        System.out.println(updatedBook);
         //assertEquals("Livre emprunté avec succès!", result);
-        assertFalse(updatedBook.isAvailable());
+        assertFalse(bookservice2.findBookById(1).isAvailable());
     }
 
     @Test

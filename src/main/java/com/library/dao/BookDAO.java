@@ -79,10 +79,8 @@ public class BookDAO {
         Book book = null;
         try (Connection connection = DbConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
-
             if (resultSet.next()) {
                 book = new Book();
                 book.setId(resultSet.getInt("id"));
@@ -96,7 +94,7 @@ public class BookDAO {
         } catch (SQLException e) {
             System.err.println("Erreur lors de la récupération du livre : " + e.getMessage());
         }
-        return null;
+        return book;
     }
 
     // recuperer livre par titre
