@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/fzhachchane/GestionBibliotheque'
+                git branch: 'main', url: 'https://github.com/fzhachchane/GestionBibliotheque.git'
             }
         }
         stage('Build') {
