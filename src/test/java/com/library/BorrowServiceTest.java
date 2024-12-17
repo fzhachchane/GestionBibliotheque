@@ -30,8 +30,8 @@ class BorrowServiceTest {
     static StudentService studentservice;
     static BookService bookservice;
 
-    @BeforeAll
-    static void setUp() {
+    @BeforeEach
+    void setUp() {
         bookDAO = new BookDAO();
         studentDAO = new StudentDAO();
         borrowDAO = new BorrowDAO(studentDAO,bookDAO);
