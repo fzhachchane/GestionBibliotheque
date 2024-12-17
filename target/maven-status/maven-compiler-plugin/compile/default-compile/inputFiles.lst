@@ -1,0 +1,11 @@
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/model/Book.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/Main.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/model/Borrow.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/service/StudentService.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/dao/BookDAO.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/dao/BorrowDAO.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/util/DbConnection.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/model/Student.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/dao/StudentDAO.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/service/BookService.java
+/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque/src/main/java/com/library/service/BorrowService.java
