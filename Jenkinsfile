@@ -22,7 +22,10 @@ pipeline {
         stage('Quality Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '${MAVEN_HOME}/bin/mvn sonar:sonar'
+                    sh '${MAVEN_HOME}/bin/mvn sonar:sonar \
+                                            -Dsonar.projectKey=GestionBibliotheque \
+                                            -Dsonar.host.url=http://localhost:9000 \
+                                            -Dsonar.login=squ_574135a1b9f1038377ca557d2740feda70228daa'
                 }
             }
         }
