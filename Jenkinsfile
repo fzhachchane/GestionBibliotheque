@@ -19,6 +19,12 @@ pipeline {
                 sh '${MAVEN_HOME}/bin/mvn test'
             }
         }
+        stage('Code Coverage') {
+            steps {
+                // Generate JaCoCo coverage report
+                sh "${MAVEN_HOME}/bin/mvn verify"
+            }
+        }
         stage('Quality Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
