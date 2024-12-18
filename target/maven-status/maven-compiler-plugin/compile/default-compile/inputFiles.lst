@@ -6,7 +6,6 @@
 /Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque_GIT/src/main/java/com/library/service/BookService.java
 /Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque_GIT/src/main/java/com/library/dao/BorrowDAO.java
 /Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque_GIT/src/main/java/com/library/model/Borrow.java
-/Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque_GIT/src/main/java/com/library/TestAivenConnection.java
 /Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque_GIT/src/main/java/com/library/service/BorrowService.java
 /Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque_GIT/src/main/java/com/library/util/DbConnection.java
 /Users/admin/Projects/IntelliJ/qualite_logiciel/GestionBibliotheque_GIT/src/main/java/com/library/model/Student.java
